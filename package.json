@@ -13,7 +13,7 @@
     "amusement",
     "demo"
   ],
-  "author": "Anderson MArtinez"
+  "author": "Anderson Martinez",
   "devDependencies": {
     "electron": "^3.0.0"
   },
