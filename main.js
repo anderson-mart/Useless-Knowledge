@@ -3,12 +3,15 @@ const axios = require('axios')
 const notifier = require('node-notifier')
 const icon = path.join(__dirname, 'icon.png')
 const { ipcMain } = require('electron')
+const { ipcStart } = require('electron')
 let { app, BrowserWindow, Tray, Menu } = require('electron')
 let url = require('url')
 let mainWindow
+let timer
 let http = require('http')
 let Stream = require('stream').Transform
 let fs = require('fs');
+let notfTimer = minuteToMil(5)
 
 function createWindow() {
     mainWindow = new BrowserWindow({ width: 500, height:300 , icon: icon })
@@ -65,5 +68,23 @@ function loadNewFact(){
   })
 }
 
+function minuteToMil(minutes){
+    return minutes  * 60 * 1000 
+}
+
+function startTimer(){
+    console.log("This started")
+    timer = setInterval(loadNewFact, notfTimer);
+}
+
+function clearTimer(newVal){
+    clearInterval(timer);
+    notfTimer = minuteToMil(newVal)
+    startTimer()
+}
+
 app.on('ready', createWindow)
-ipcMain.on('click', () => loadNewFact());
+
+ipcMain.on('click', ()              => loadNewFact())
+ipcMain.on('start', ()              => startTimer())
+ipcMain.on('change', (data, newVal) => clearTimer(newVal))
