@@ -2,7 +2,7 @@ const path = require('path')
 const axios = require('axios')
 const notifier = require('node-notifier')
 const icon = path.join(__dirname, '/img/icon.png')
-const { ipcMain } = require('electron')
+const { ipcMain }  = require('electron')
 let { app, BrowserWindow, Tray, Menu } = require('electron')
 let url = require('url')
 let mainWindow

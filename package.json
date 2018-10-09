@@ -1,5 +1,5 @@
 {
-  "name": "Useless-Knowledge",
+  "name": "useless-knowledge",
   "version": "0.0.1",
   "description": "Basic Electron-driven random fact app.",
   "main": "main.js",
