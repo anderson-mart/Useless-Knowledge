@@ -1,28 +1,24 @@
 const path = require('path')
 const axios = require('axios')
 const notifier = require('node-notifier')
-const icon = path.join(__dirname, 'icon.png')
+const icon = path.join(__dirname, '/img/icon.png')
 const { ipcMain } = require('electron')
-const { ipcStart } = require('electron')
 let { app, BrowserWindow, Tray, Menu } = require('electron')
 let url = require('url')
 let mainWindow
 let timer
 let http = require('http')
 let Stream = require('stream').Transform
-let fs = require('fs');
-let notfTimer = minuteToMil(5)
+let fs = require('fs')
 
 function createWindow() {
     mainWindow = new BrowserWindow({ width: 500, height:300 , icon: icon })
     mainWindow.setMenu(null)
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-    }))
+    mainWindow.loadFile('index.html')
     mainWindow.webContents.executeJavaScript(`
-        var button = document.querySelector("#start");
+        var button = document.querySelector("#start")
         button.addEventListener("click", function onclick(event) {start()
-        });
+        })
     `)
 
     let appIcon = new Tray(icon)
@@ -63,7 +59,7 @@ function loadNewFact(){
         icon: path.join(__dirname, 'icon.png'),
         sound: true,
       },
-    );
+    )
 
   })
 }
@@ -72,19 +68,34 @@ function minuteToMil(minutes){
     return minutes  * 60 * 1000 
 }
 
-function startTimer(){
+function startTimer(newVal){
+    if (newVal){
+        notfTimer = minuteToMil(newVal)
+    } else {
+        notfTimer = minuteToMil(5)
+    }
+
+
+    console.log(newVal)
+    timer = setInterval(loadNewFact, notfTimer)
     console.log("This started")
-    timer = setInterval(loadNewFact, notfTimer);
 }
 
 function clearTimer(newVal){
-    clearInterval(timer);
-    notfTimer = minuteToMil(newVal)
-    startTimer()
+    if (timer){
+        clearInterval(timer)
+        startTimer(newVal)
+    }
+}
+
+function closeApp() {
+    console.log("Closed")
+    app.quit()
 }
 
 app.on('ready', createWindow)
 
 ipcMain.on('click', ()              => loadNewFact())
-ipcMain.on('start', ()              => startTimer())
+ipcMain.on('start', (data, newVal)  => startTimer(newVal))
 ipcMain.on('change', (data, newVal) => clearTimer(newVal))
+ipcMain.on('close', ()              => closeApp())
